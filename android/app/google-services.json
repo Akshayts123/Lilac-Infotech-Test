@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "58407909000",
+    "project_id": "lilac-infotech-dc844",
+    "storage_bucket": "lilac-infotech-dc844.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:58407909000:android:c1277cf5e71a5ce5ab113d",
+        "android_client_info": {
+          "package_name": "com.example.lilac_infotech"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAREbPlMrsAOuNs3qWIaxuIsiSZtqKyOCg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
