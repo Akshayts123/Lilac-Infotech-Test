@@ -1,10 +1,8 @@
 import 'dart:io';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../../../core/Helper/sharedPref.dart';
 import '../../../core/Helper/snackbar_toast_helper.dart';
 
@@ -14,7 +12,7 @@ class ProfileController extends GetxController {
   var emaill = ''.obs;
   var dob = ''.obs;
   var imgg = ''.obs;
-  File? _image;
+  File? image;
   final ImagePicker _picker = ImagePicker();
 
   @override
@@ -38,7 +36,7 @@ class ProfileController extends GetxController {
   Future<void> pickImage() async {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
-      _image = File(pickedFile.path);
+      image = File(pickedFile.path);
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString('imagePath', pickedFile.path);
       imgg.value = pickedFile.path;
@@ -49,7 +47,7 @@ class ProfileController extends GetxController {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? imagePath = prefs.getString('imagePath');
     if (imagePath != null) {
-      _image = File(imagePath);
+      image = File(imagePath);
     }
   }
 
@@ -59,7 +57,7 @@ class ProfileController extends GetxController {
           .pickImage(source: ImageSource.gallery, imageQuality: 100);
       if (pickedImage == null) return;
       final imageTemp = File(pickedImage.path);
-      _image = imageTemp;
+      image = imageTemp;
       imgg.value = pickedImage.path;
       await setSharedPrefrence(IMG, pickedImage.path);
       showToastSuccess("Photo Updated!");

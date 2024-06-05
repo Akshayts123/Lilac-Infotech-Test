@@ -2,14 +2,16 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lilac_infotech/presentation/home_screen/widgets/video_player_widget.dart';
 import '../../widget/drawer/drawer.dart';
+import 'controller/home_controller.dart';
 
 class MyHomePage extends StatelessWidget {
   MyHomePage({Key? key,}) : super(key: key);
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
+  final controller =Get.put(VideoPlayerControllers());
   @override
   Widget build(BuildContext context) {
     return  WillPopScope(
@@ -18,7 +20,7 @@ class MyHomePage extends StatelessWidget {
       },
       child: SafeArea(
         child: Scaffold(
-          key: _scaffoldKey,
+          key: controller.scaffoldKey,
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           drawer: DrawerWidget(),
           body: SingleChildScrollView(
@@ -29,7 +31,7 @@ class MyHomePage extends StatelessWidget {
                 Duration(minutes: 1, seconds: 18),
                 Duration(minutes: 1, seconds: 47),
               ],
-              scaffoldKey: _scaffoldKey,
+              scaffoldKey: controller.scaffoldKey,
             ),
           ),
         ),

@@ -4,8 +4,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:timer_button/timer_button.dart';
 import '../../core/Helper/Constants.dart';
-import '../../core/Helper/snackbar_toast_helper.dart';
-import '../home_screen/home_screen.dart';
 import '../login_screen/Widget/bezierContainer.dart';
 import 'controller/otp_controller.dart';
 

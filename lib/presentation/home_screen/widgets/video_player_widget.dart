@@ -1,21 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lilac_infotech/presentation/home_screen/widgets/vedio_listing.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:video_player/video_player.dart';
-import 'package:path_provider/path_provider.dart';
-import 'dart:io';
-import 'package:path/path.dart' as path;
-import 'package:firebase_storage/firebase_storage.dart';
-import '../../../core/Helper/sharedPref.dart';
-import '../../../core/Helper/snackbar_toast_helper.dart';
 import '../../../core/constants/assets_utils.dart';
-import '../../../core/utils/link.dart';
 import '../../../routes/app_routes.dart';
 import '../controller/home_controller.dart';
 import 'custom_controls_widget.dart';
@@ -32,7 +23,6 @@ class VideoPlayerWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final VideoPlayerControllers videoPlayerController = Get.put(VideoPlayerControllers());
     final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
     final videoHeight = isPortrait ? 220.0 : MediaQuery.of(context).size.height - 20;
 

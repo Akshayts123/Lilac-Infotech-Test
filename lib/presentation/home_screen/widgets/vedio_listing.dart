@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:lilac_infotech/presentation/home_screen/widgets/video_player_widget.dart';
 import '../controller/list_controller.dart';
 import '../home_screen.dart';
 
