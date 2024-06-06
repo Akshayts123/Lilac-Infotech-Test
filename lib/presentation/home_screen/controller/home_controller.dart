@@ -1,7 +1,6 @@
 import 'dart:io';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +14,7 @@ class VideoPlayerControllers extends GetxController {
   late VideoPlayerController controller = VideoPlayerController.network('');
   RxList<String> videoUrls = <String>[].obs;
   RxInt currentIndex = 0.obs;
+  var isUIVisible = true.obs;
   RxBool isDownloading = false.obs;
   RxBool offLine = false.obs;
   File? image;
@@ -32,7 +32,9 @@ class VideoPlayerControllers extends GetxController {
       initializeVideoPlayer();
     }
   }
-
+  void toggleUIVisibility() {
+    isUIVisible.value = !isUIVisible.value;
+  }
   Future<List<String>> getVideoUrls() async {
     List<String> videoUrls = [];
     final ListResult result = await FirebaseStorage.instance.ref('Files').listAll();
@@ -78,25 +80,39 @@ class VideoPlayerControllers extends GetxController {
       }
 
       final String fileName = path.basename(videoLink);
-      final String localPath = path.join(directory.path, fileName);
 
-      final File file = File(localPath);
-      if (!file.existsSync()) {
-        final Reference ref = FirebaseStorage.instance.refFromURL(videoLink);
-        final DownloadTask downloadTask = ref.writeToFile(file);
-        await downloadTask.whenComplete(() {});
+      // Download the unencrypted file
+      final String unencryptedLocalPath = path.join(directory.path, fileName);
+      final File unencryptedFile = File(unencryptedLocalPath);
+      if (!unencryptedFile.existsSync()) {
+        final Reference unencryptedRef = FirebaseStorage.instance.refFromURL(videoLink);
+        final DownloadTask unencryptedDownloadTask = unencryptedRef.writeToFile(unencryptedFile);
+        await unencryptedDownloadTask.whenComplete(() {});
       }
 
-      await setSharedPrefrence(videoLink, file.path);
+      // Encrypt and download the file
+      final String encryptedLocalPath = path.join(directory.path, 'encrypted_$fileName');
+      final File encryptedFile = File(encryptedLocalPath);
+      if (!encryptedFile.existsSync()) {
+        final Reference encryptedRef = FirebaseStorage.instance.refFromURL(videoLink);
+        final DownloadTask encryptedDownloadTask = encryptedRef.writeToFile(encryptedFile);
+        await encryptedDownloadTask.whenComplete(() {});
+      }
+
+      // Save paths to SharedPreferences
+      await setSharedPrefrence(videoLink, unencryptedLocalPath);
+      await setSharedPrefrence('encrypted_$fileName', encryptedLocalPath);
+
       isDownloading.value = false;
       offLine.value = true;
-      showToastSuccess("Download Complete!");
+      showToastSuccess("Download & Encryption Complete!");
     } catch (e) {
       isDownloading.value = false;
       offLine.value = false;
       showToastError("Download Failed: $e");
     }
   }
+
 
   Future<void> _loadImage() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -146,6 +162,8 @@ class VideoPlayerControllers extends GetxController {
   Stream<int> timerStream() {
     return Stream.periodic(Duration(seconds: 1), (count) => count);
   }
+
+
 
   @override
   void onClose() {

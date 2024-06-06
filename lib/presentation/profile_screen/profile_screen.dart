@@ -5,7 +5,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:lilac_infotech/presentation/profile_screen/edit_profile/controller/edit_controller.dart';
 import '../../core/constants/assets_utils.dart';
 import 'controller/profile_controller.dart';
-
 import 'edit_profile/edit_profile.dart';
 
 class ProfilePage extends StatelessWidget {
@@ -29,6 +28,7 @@ class ProfilePage extends StatelessWidget {
               child: Icon(Icons.arrow_back_outlined, color: Colors.white),
               onTap: () {
                 Navigator.pop(context);
+                controller.refresh();
               },
             ),
           ),
@@ -105,7 +105,7 @@ class ProfilePage extends StatelessWidget {
                       right: 0,
                       child: GestureDetector(
                         onTap: () async {
-                          await controller.pickImage();
+                          await controller.uploadImage();
                         },
                         child: CircleAvatar(
                           backgroundColor: Theme.of(context).primaryColor,

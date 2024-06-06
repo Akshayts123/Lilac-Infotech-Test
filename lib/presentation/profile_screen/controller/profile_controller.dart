@@ -40,6 +40,8 @@ class ProfileController extends GetxController {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString('imagePath', pickedFile.path);
       imgg.value = pickedFile.path;
+      refresh();
+      update();
     }
   }
 
@@ -61,6 +63,8 @@ class ProfileController extends GetxController {
       imgg.value = pickedImage.path;
       await setSharedPrefrence(IMG, pickedImage.path);
       showToastSuccess("Photo Updated!");
+      refresh();
+      update();
     } on PlatformException catch (e) {
       showToastError("Failed to pick image: $e");
     }

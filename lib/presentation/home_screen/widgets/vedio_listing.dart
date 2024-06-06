@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../controller/list_controller.dart';
-import '../home_screen.dart';
-
 
 class VideoListPage extends StatelessWidget {
   final  videoController = Get.put(VideoListController());
@@ -21,7 +19,7 @@ class VideoListPage extends StatelessWidget {
         itemBuilder: (context, index) {
           return ListTile(
             title: Text(
-              'Video ${index + 1}',
+              'Playlist vedio ${index + 1}',
               style: GoogleFonts.poppins(fontSize: 13),
             ),
             subtitle: Text(
@@ -30,9 +28,9 @@ class VideoListPage extends StatelessWidget {
             ),
             leading: videoController.videoThumbnails.isNotEmpty
                 ? Image.network(videoController.videoThumbnails[index])
-                : Image.asset('assets/thumb.png'),
+                : Image.asset('assets/thumbnail.jpeg'),
             onTap: () {
-              Get.to(MyHomePage());
+              // Get.to(MyHomePage());
             },
           );
         },
