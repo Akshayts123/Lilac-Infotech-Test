@@ -156,35 +156,35 @@ class VideoPlayerWidget extends StatelessWidget {
                       ),
                       InkWell(
                         onTap: () {
-                          controller.addToCache(controller.videoUrls[controller.currentIndex.value]);
+                          if (!controller.offLine.value) {
+                            controller.addToCache(controller.videoUrls[controller.currentIndex.value]);
+                          }
                         },
                         child: Container(
                           height: 50,
                           padding: EdgeInsets.symmetric(horizontal: 15),
                           decoration: BoxDecoration(
-                              color: Get.isDarkMode ? Colors.grey.shade700 : Colors.white,
-                              borderRadius: BorderRadius.circular(15)),
+                            color: Get.isDarkMode ? Colors.grey.shade700 : Colors.white,
+                            borderRadius: BorderRadius.circular(15),
+                          ),
                           child: Center(
                             child: Row(
                               children: [
-                                controller.isDownloading.value
+                                controller.offLine.value
+                                    ? Container() // Blank container when downloaded
+                                    : controller.isDownloading.value
                                     ? Image.asset(assetsPath + "dots.png")
                                     : SvgPicture.asset(
                                   assetsPath + "down.svg",
                                   height: 12,
                                 ),
-                                SizedBox(
-                                  width: 8,
-                                ),
-                                controller.offLine.value
-                                    ? Text(
-                                  "Downloaded",
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 16,
-                                  ),
-                                )
-                                    : Text(
-                                  controller.isDownloading.value ? "Downloading..." : "Download",
+                                SizedBox(width: 8),
+                                Text(
+                                  controller.offLine.value
+                                      ? "Downloaded"
+                                      : controller.isDownloading.value
+                                      ? "Downloading..."
+                                      : "Download",
                                   style: GoogleFonts.poppins(
                                     fontSize: 16,
                                   ),

@@ -1,20 +1,18 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
-import 'package:get/get.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:video_player/video_player.dart';
-import 'package:path_provider/path_provider.dart';
 import 'dart:io';
-import 'package:path/path.dart' as path;
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:get/get.dart';
+import 'package:flutter/material.dart';
+import 'package:video_player/video_player.dart';
+import 'package:path/path.dart' as path;
 import '../../../core/Helper/sharedPref.dart';
 import '../../../core/Helper/snackbar_toast_helper.dart';
 
 class VideoPlayerControllers extends GetxController {
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
-  late VideoPlayerController controller;
+  late VideoPlayerController controller = VideoPlayerController.network('');
   RxList<String> videoUrls = <String>[].obs;
   RxInt currentIndex = 0.obs;
   RxBool isDownloading = false.obs;
@@ -25,17 +23,6 @@ class VideoPlayerControllers extends GetxController {
   void onInit() {
     super.onInit();
     fetchVideoUrls();
-    controller = VideoPlayerController.network(
-      'https://videos.pexels.com/video-files/4440931/4440931-hd_1280_720_50fps.mp4',
-    );
-    _loadImage();
-    controller.addListener(() {
-      update();
-    });
-    controller.setLooping(true);
-    controller.initialize().then((_) {
-      update();
-    });
   }
 
   Future<void> fetchVideoUrls() async {
@@ -65,11 +52,17 @@ class VideoPlayerControllers extends GetxController {
       final String localPath = await getLocalPath(currentUrl);
       controller = VideoPlayerController.file(File(localPath))
         ..initialize().then((_) {
+          offLine.value = true;
+          showToastSuccess("Playing in Offline!");
+          controller.play();
           update();
         });
     } else {
       controller = VideoPlayerController.network(currentUrl)
         ..initialize().then((_) {
+          offLine.value = false;
+          showToastSuccess("Playing in Online!");
+          controller.play();
           update();
         });
     }
@@ -77,11 +70,32 @@ class VideoPlayerControllers extends GetxController {
 
   Future<void> addToCache(String videoLink) async {
     isDownloading.value = true;
-    var file = await DefaultCacheManager().getSingleFile(videoLink);
-    await setSharedPrefrence(VIDEOPATH, file.path);
-    isDownloading.value = false;
-    offLine.value = true;
-    showToastSuccess("Download Complete!");
+
+    try {
+      final Directory? directory = await getExternalStorageDirectory();
+      if (directory == null) {
+        throw Exception("Could not get external storage directory");
+      }
+
+      final String fileName = path.basename(videoLink);
+      final String localPath = path.join(directory.path, fileName);
+
+      final File file = File(localPath);
+      if (!file.existsSync()) {
+        final Reference ref = FirebaseStorage.instance.refFromURL(videoLink);
+        final DownloadTask downloadTask = ref.writeToFile(file);
+        await downloadTask.whenComplete(() {});
+      }
+
+      await setSharedPrefrence(videoLink, file.path);
+      isDownloading.value = false;
+      offLine.value = true;
+      showToastSuccess("Download Complete!");
+    } catch (e) {
+      isDownloading.value = false;
+      offLine.value = false;
+      showToastError("Download Failed: $e");
+    }
   }
 
   Future<void> _loadImage() async {
@@ -98,7 +112,10 @@ class VideoPlayerControllers extends GetxController {
   }
 
   Future<String> getLocalPath(String url) async {
-    final Directory directory = await getApplicationDocumentsDirectory();
+    final Directory? directory = await getExternalStorageDirectory();
+    if (directory == null) {
+      throw Exception("Could not get external storage directory");
+    }
     final String fileName = path.basename(url);
     return '${directory.path}/$fileName';
   }
